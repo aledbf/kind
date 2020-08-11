@@ -32,8 +32,7 @@ func Build(options ...Option) error {
 		image:     DefaultImage,
 		baseImage: DefaultBaseImage,
 		logger:    log.NoopLogger{},
-		// TODO: only host arch supported. changing this will be tricky
-		arch: runtime.GOARCH,
+		arch:      runtime.GOARCH,
 	}
 
 	// apply user options
@@ -76,6 +75,7 @@ func supportedArch(arch string) bool {
 	case "amd64":
 	case "arm64":
 	case "ppc64le":
+	case "s390x":
 	}
 	return true
 }
@@ -88,8 +88,8 @@ type buildContext struct {
 	image     string
 	baseImage string
 	logger    log.Logger
+	arch      string
 	// non-option fields
-	arch     string // TODO(bentheelder): this should be an option
 	kubeRoot string
 	bits     kube.Bits
 }

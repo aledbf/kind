@@ -17,6 +17,8 @@ limitations under the License.
 package nodeimage
 
 import (
+	"runtime"
+
 	"github.com/spf13/cobra"
 
 	"sigs.k8s.io/kind/pkg/build/nodeimage"
@@ -31,6 +33,7 @@ type flagpole struct {
 	Image     string
 	BaseImage string
 	KubeRoot  string
+	Arch      string
 }
 
 // NewCommand returns a new cobra.Command for building the node image
@@ -65,6 +68,11 @@ func NewCommand(logger log.Logger, streams cmd.IOStreams) *cobra.Command {
 		nodeimage.DefaultBaseImage,
 		"name:tag of the base image to use for the build",
 	)
+	cmd.Flags().StringVar(
+		&flags.Arch, "arch",
+		runtime.GOARCH,
+		"name:arch to use for the build",
+	)
 	return cmd
 }
 
@@ -75,6 +83,7 @@ func runE(logger log.Logger, flags *flagpole) error {
 		nodeimage.WithBaseImage(flags.BaseImage),
 		nodeimage.WithKuberoot(flags.KubeRoot),
 		nodeimage.WithLogger(logger),
+		nodeimage.WithArch(flags.Arch),
 	); err != nil {
 		return errors.Wrap(err, "error building node image")
 	}

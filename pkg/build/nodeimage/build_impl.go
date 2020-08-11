@@ -287,7 +287,7 @@ func (c *buildContext) prePullImages(dir, containerID string) ([]string, error) 
 		fns = append(fns, func() error {
 			if !builtImages.Has(image) {
 				fmt.Printf("Pulling: %s\n", image)
-				err := docker.Pull(c.logger, image, 2)
+				err := docker.Pull(c.logger, image, c.arch, 2)
 				if err != nil {
 					c.logger.Warnf("Failed to pull %s with error: %v", image, err)
 				}
@@ -370,7 +370,7 @@ func (c *buildContext) prePullImages(dir, containerID string) ([]string, error) 
 func (c *buildContext) createBuildContainer(buildDir string) (id string, err error) {
 	// attempt to explicitly pull the image if it doesn't exist locally
 	// we don't care if this errors, we'll still try to run which also pulls
-	_, _ = docker.PullIfNotPresent(c.logger, c.baseImage, 4)
+	_, _ = docker.PullIfNotPresent(c.logger, c.baseImage, c.arch, 4)
 	// this should be good enough: a specific prefix, the current unix time,
 	// and a little random bits in case we have multiple builds simultaneously
 	random := rand.New(rand.NewSource(time.Now().UnixNano())).Int31()
@@ -383,6 +383,7 @@ func (c *buildContext) createBuildContainer(buildDir string) (id string, err err
 			// the container should hang forever so we can exec in it
 			"--entrypoint=sleep",
 			"--name=" + id,
+			"--platform=" + c.arch,
 		},
 		[]string{
 			"infinity", // sleep infinitely to keep the container around

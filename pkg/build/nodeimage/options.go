@@ -63,6 +63,14 @@ func WithKuberoot(root string) Option {
 	})
 }
 
+// WithArch sets the platform for the build of images
+func WithArch(arch string) Option {
+	return optionAdapter(func(b *buildContext) error {
+		b.arch = arch
+		return nil
+	})
+}
+
 // WithLogger sets the logger
 func WithLogger(logger log.Logger) Option {
 	return optionAdapter(func(b *buildContext) error {
